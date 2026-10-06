@@ -1,0 +1,76 @@
+[project]
+name = "lisn"
+version = "0.1.0"
+description = "Local, free, word-for-word text-to-speech reader with sentence and word highlighting."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11,<3.13"
+authors = [{ name = "Gaurav Wagh" }]
+keywords = ["tts", "text-to-speech", "reader", "kokoro", "accessibility"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+dependencies = [
+  "typer>=0.12",
+  "rich>=13",
+  "platformdirs>=4",
+  "numpy>=1.26",
+  "soundfile>=0.12",
+  "sounddevice>=0.4.6",
+  "pysbd>=0.3.4",
+  "num2words>=0.5.13",
+  "kokoro>=0.9.4",
+  "transformers>=4.40",
+  "textual>=8",
+  # misaki (Kokoro's G2P) needs this spaCy model and tries to pip-install it at runtime otherwise
+  "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+]
+
+[project.optional-dependencies]
+piper = ["piper-tts>=1.8"]
+edge = ["edge-tts>=7"]
+extract = [
+  "pymupdf>=1.24",
+  "python-docx>=1.1",
+  "trafilatura>=1.9",
+  "ebooklib>=0.18",
+  "beautifulsoup4>=4.12",
+  "pyperclip>=1.8",
+]
+tui = ["textual>=8"]
+server = ["fastapi>=0.110", "uvicorn>=0.29", "pydantic>=2"]
+mcp = ["mcp>=2"]
+gdoc = ["google-auth-oauthlib>=1.2", "google-api-python-client>=2.120"]
+all = ["lisn[piper,edge,extract,tui,server,mcp,gdoc]"]
+dev = ["pytest>=8", "pytest-cov>=5", "pytest-asyncio>=0.23", "httpx>=0.27", "ruff>=0.5"]
+
+[project.scripts]
+lisn = "lisn.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["lisn"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+asyncio_mode = "auto"
+markers = ["slow: tests that load the TTS model (deselect with -m 'not slow')"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+"lisn/tts/kokoro.py" = ["N806"]
